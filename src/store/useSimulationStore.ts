@@ -1,43 +1,64 @@
-import {create} from "zustand";
+import { create } from 'zustand';
 
-interface SimulationState {
-
-    //all around simulation controls
-    isPaused: boolean;
-    simSpeed: number; //speed multiplier (1x, 5x, 10x)
-    selectedPlanet: string | null; //id of selected planet for info display
-
-    //"what if" scenario controls
-    sunMassMultiplier: number; //multiplier for sun mass in gravity calculations
-    earthDistanceMultiplier: number; //multiplier for earth's distance from sun, affects all planets proportionally
-
-
-    //actions
-    setPause: (paused: boolean) => void;
-    setSimSpeed: (speed: number) => void;
-    selectPlanet: (planetId: string | null) => void;
-    updateSunMass: (multiplier: number) => void;
-    updateEarthDistance: (multiplier: number) => void;
-    resetScenario: () => void;
+export interface CosmicWarning {
+    id: string;
+    message: string;
 }
 
-export const useSimulationStore = create<SimulationState>()((set) => ({
-  isPaused: false,
-  simSpeed: 1,
-  selectedPlanet: null,
-  sunMassMultiplier: 1.0,
-  earthDistanceMultiplier: 1.0,
+// // track custom teleportations via raw id pairings
+export interface TeleportMap {
+    [key: string]: string | null; // // e.g., earth: "jupiter" means earth is snapped to jupiter
+}
 
-  setPause: (paused: boolean) => set({ isPaused: paused }),
-  setSimSpeed: (speed: number) => set({ simSpeed: speed }),
-  selectPlanet: (planetId: string | null) => set({ selectedPlanet: planetId }),
-  updateSunMass: (multiplier: number) => set({ sunMassMultiplier: multiplier }),
-  updateEarthDistance: (multiplier: number) => set({ earthDistanceMultiplier: multiplier }),
-  resetScenario: () => set({
+export interface SimulationState {
+    isPaused: boolean;
+    simSpeed: number;
+    isEditing: boolean;
+    warnings: CosmicWarning[];
+    selectedPlanet: string | null;
+    resetCounter: number;
+    teleports: TeleportMap;
+    
+    toggleEditMode: () => void;
+    addWarning: (message: string) => void;
+    removeWarning: (id: string) => void;
+    selectPlanet: (id: string | null) => void;
+    teleportObject: (objectId: string, targetId: string | null) => void;
+    exitAndReset: () => void;
+}
+
+export const useSimulationStore = create<SimulationState>((set) => ({
     isPaused: false,
     simSpeed: 1,
+    isEditing: false,
+    warnings: [],
     selectedPlanet: null,
-    sunMassMultiplier: 1.0,
-    earthDistanceMultiplier: 1.0,
-  }),
+    resetCounter: 0,
+    teleports: {},
+
+    toggleEditMode: () => set((state) => ({ isEditing: !state.isEditing })),
+    
+    addWarning: (message) => set((state) => ({
+        warnings: [...state.warnings, { id: Math.random().toString(36).substring(7), message }]
+    })),
+    
+    removeWarning: (id) => set((state) => ({
+        warnings: state.warnings.filter((w) => w.id !== id)
+    })),
+
+    selectPlanet: (id) => set({ selectedPlanet: id }),
+
+    // // maps out new positions via id targeting keys
+    teleportObject: (objectId, targetId) => set((state) => ({
+        teleports: { ...state.teleports, [objectId]: targetId }
+    })),
+
+    // // purges the entire teleport map instantly to force perfect mathematical track snapping
+    exitAndReset: () => set((state) => ({
+        isEditing: false,
+        warnings: [],
+        selectedPlanet: null,
+        teleports: {},
+        resetCounter: state.resetCounter + 1
+    }))
 }));

@@ -1,116 +1,49 @@
 export interface PlanetData {
     id: string;
     name: string;
-    radius: number; //visual scale size
-    semiMajorAxis: number; //distance from sun
-    speed: number; //orbital speed coefficient, not actual speed
-    texturePath: string; //matches /public/textures/
-    color: string; //fallback color
+    radius: number;
+    semiMajorAxis: number;
+    speed: number;
+    texturePath: string;
+    color: string;
     description: string;
-    facts: string[]; //rendered in UI on click
-    hasRings: boolean; //trigger for ring rendering
+    facts: string[];
+    hasRings: boolean;
+    parentId?: string;
+    // We keep natural_sat for potential future moons, but Earth's moon is now independent
+    natural_sat?: {
+        id: string;
+        name: string;
+        radius: number;
+        semiMajorAxis: number;
+        speed: number;
+        texturePath: string;
+        description?: string;
+        facts?: string[];
+    }[];
 }
 
 export const PLANETS: PlanetData[] = [
-    { //mercury
-        id: 'mercury',
-        name: 'Mercury',
-        radius: 0.4,
-        semiMajorAxis: 6,
-        speed: 0.04,
-        texturePath: '/textures/mercury.jpg',
-        color: '#8c8c8c',
-        description: 'The smalled planet in out solar system and the closest to the Sun.',
-        facts: [
-            'A year on Mercury is equivalent to 88 days on Earth.',
-            'Despite being closest to the Sun, it is not the hottest planet (Venus is).',
-            'Mercury has a massive iron core that takes up to 42% of its volume'
-        ],
-        hasRings: false
-
+    { id: 'sun', name: 'The Sun', radius: 3.5, semiMajorAxis: 0, speed: 0, texturePath: '/textures/sun.jpg', color: '#ffcc00', description: 'The star at the heart of our solar system.', facts: ['4.5 billion years old.', 'Core temp 15 million C.', 'Light takes 8m 20s to reach Earth.'], hasRings: false },
+    { id: 'mercury', name: 'Mercury', radius: 0.4, semiMajorAxis: 6, speed: 0.04, texturePath: '/textures/mercury.jpg', color: '#8c8c8c', description: 'Closest to the Sun.', facts: ['88-day year.', 'Not the hottest planet.', 'Huge iron core.'], hasRings: false },
+    { id: 'venus', name: 'Venus', radius: 0.9, semiMajorAxis: 9, speed: 0.015, texturePath: '/textures/venus.jpg', color: '#e3bb76', description: 'Thick, toxic atmosphere.', facts: ['Spins backwards.', 'Crushing pressure.', '475°C.'], hasRings: false },
+    { id: 'earth', name: 'Earth', radius: 0.6, semiMajorAxis: 13, speed: 0.01, texturePath: '/textures/earth.jpg', color: '#2b82c9', description: 'Our home.', facts: ['71% water.', 'Protective atmosphere.', 'No god name.'], hasRings: false },
+    { 
+        id: 'moon', 
+        name: 'The Moon', 
+        radius: 0.25, 
+        semiMajorAxis: 2.0, 
+        speed: 0.05, 
+        texturePath: '/textures/moon.jpg', 
+        color: '#aaaaaa',
+        description: 'Earth’s natural satellite.', 
+        facts: ['Stabilizes Earth tilt.', 'Fifth largest moon.', 'No atmosphere.'], 
+        hasRings: false,
+        parentId: 'earth' // // added parentId to link moon to earth for potential future use
     },
-    { //venus
-        id: 'venus',
-        name: 'Venus',
-        radius: 0.9,
-        semiMajorAxis: 9,
-        speed: 0.015,
-        texturePath: '/textures/venus.jpg',
-        color: '#e3bb76',
-        description: 'Venus has a thick, toxic atmosphere filled with carbon dioxide.',
-        facts: [
-            'Venus spins backwards on its axis compared to most other planets.',
-            'Its atmospheric pressure is 90 times greater than Earth\'s. Crushing anything that lands on the planet',
-            'Surface temperatures reach a scorching 475°C (900°F).'
-        ],
-        hasRings: false
-
-    },
-    {//earth
-        id: 'earth',
-        name: 'Earth',
-        radius: 0.6,
-        semiMajorAxis: 13,
-        speed: 0.01,
-        texturePath: '/textures/earth.jpg',
-        color: '#2b82c9',
-        description: 'Our home planet is the only place we know of so far that’s inhabited by living things.',
-        facts: [
-            'Water covers about 71% of Earth\'s surface.',
-            'Earth’s atmosphere protects us from incoming meteoroids, which safely burn up before hitting ground.',
-            'It is the only planet in our solar system not named after a god or goddess.'
-        ],
-        hasRings: false
-
-    },
-    {//mars
-        id: 'mars',
-        name: 'Mars',
-        radius: 0.6,
-        semiMajorAxis: 17,
-        speed: 0.008,
-        texturePath: '/textures/mars.jpg',
-        color: '#c1440e',
-        description: 'Mars is a dusty, cold, desert world with a very thin atmosphere.',
-        facts: [
-            'Mars is home to Olympus Mons, the largest volcano in the solar system (3x taller than Mt. Everest).',
-            'Liquid water cannot exist on Mars’ surface for long due to the low atmospheric pressure.',
-            'Iron oxide (rust) in its soil gives Mars its signature red look.'
-        ],
-        hasRings: false
-
-    },
-    {//jupiter
-        id: 'jupiter',
-        name: 'Jupiter',
-        radius: 2.2,
-        semiMajorAxis: 24,
-        speed: 0.002,
-        texturePath: '/textures/jupiter.jpg',
-        color: '#b07f35',
-        description: 'Jupiter is more than twice as massive than the other planets of our solar system combined.',
-        facts: [
-            'Jupiter’s Great Red Spot is a massive storm wider than Earth that has raged for hundreds of years.',
-            'It possesses a powerful magnetic field 14 times stronger than Earth’s.',
-            'Jupiter functions as a gravitational shield, capturing or deflecting incoming comets.'
-        ],
-        hasRings: false
-    },
-    {//saturn
-        id: 'saturn',
-        name: 'Saturn',
-        radius: 1.8,
-        semiMajorAxis: 30,
-        speed: 0.0009,
-        texturePath: '/textures/saturn.jpg',
-        color: '#e2bf7d',
-        description: 'Adorned with a dazzling, complex system of icy rings, Saturn is a unique gas giant.',
-        facts: [
-            'Saturn’s rings are not solid structures; they are made of billions of individual particles of ice and rock.',
-            'It is the least dense planet in the solar system—it could literally float in a giant bathtub.',
-            'Winds in Saturn’s upper atmosphere can reach a staggering 1,800 kilometers per hour.'
-        ],
-        hasRings: true
-
-    }
+    { id: 'mars', name: 'Mars', radius: 0.6, semiMajorAxis: 17, speed: 0.008, texturePath: '/textures/mars.jpg', color: '#c1440e', description: 'The Red Planet.', facts: ['Largest volcano.', 'No liquid water.', 'Rusty soil.'], hasRings: false },
+    { id: 'jupiter', name: 'Jupiter', radius: 2.2, semiMajorAxis: 24, speed: 0.002, texturePath: '/textures/jupiter.jpg', color: '#b07f35', description: 'Gas giant.', facts: ['Great Red Spot.', 'Strong magnetic field.', 'Gravitational shield.'], hasRings: false },
+    { id: 'saturn', name: 'Saturn', radius: 1.8, semiMajorAxis: 30, speed: 0.0009, texturePath: '/textures/saturn.jpg', color: '#e2bf7d', description: 'Ringed world.', facts: ['Billions of ice particles.', 'Low density.', 'Fast winds.'], hasRings: true },
+    { id: 'uranus', name: 'Uranus', radius: 1.5, semiMajorAxis: 36, speed: 0.0004, texturePath: '/textures/uranus.jpg', color: '#d1e7e7', description: 'Icy giant.', facts: ['Rotates on side.', 'Methane atmosphere.', '27 moons.'], hasRings: true },
+    { id: 'neptune', name: 'Neptune', radius: 1.4, semiMajorAxis: 42, speed: 0.0003, texturePath: '/textures/neptune.jpg', color: '#3e54e8', description: 'Distant blue world.', facts: ['Found by math.', 'Strongest winds.', '165-year orbit.'], hasRings: false }
 ];
